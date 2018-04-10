@@ -22,6 +22,12 @@ int main(int argc, char** argv[])
 	string inputFileName = argv[4];
 	string outputFileName = argv[5];
 	
+	switch (cipherName)
+	{ 
+		case 'AES' : break;
+		case 'DES' : break;
+	}
+	
 	
 	/* Create an instance of the DES cipher */	
 	CipherInterface* cipher = NULL; 
