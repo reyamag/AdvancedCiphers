@@ -1,6 +1,8 @@
 #include "AES.h"
 #include <string>
 #include <iostream>
+#include <stdio.h>
+#include <openssl/aes.h>
 
 /**
  * Sets the key to use
