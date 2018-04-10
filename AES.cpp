@@ -1,4 +1,6 @@
 #include "AES.h"
+#include <string>
+#include <iostream>
 
 /**
  * Sets the key to use
