@@ -28,9 +28,26 @@ bool AES::setKey(const unsigned char* keyArray)
 	// For documentation, please see https://boringssl.googlesource.com/boringssl/+/2623/include/openssl/aes.h
 	// and aes.cpp example provided with the assignment.
 	
-	
-	return false;
-	
+	string keyArray[17];
+
+	//Checking for the first byte to see if the key is going to be used for 
+	//encrpytion or decrpyption
+	if (keyArray[0] == 0)
+	{
+		AES_KEY enc_key;
+		AES_set_encrpyt_key(aes_key, 128, &enc_key);
+		return true;
+	} 
+	else if (keyArray[0] > 0)
+	{
+		AES_KEY dec_key;
+		AES_set_decrpyt_key(aes_key, 128, &dec_key);
+		return true;
+	} 
+	else
+	{
+		return false;
+	}
 }
 
 /**	
