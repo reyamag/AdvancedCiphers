@@ -5,7 +5,7 @@
 
 using namespace std;
 
-int main(int argc, char** argv)
+int main(int argc, char** argv[])
 {
 	/**
 	 * TODO: Replace the code below	with your code which can SWITCH
@@ -16,6 +16,11 @@ int main(int argc, char** argv)
 	 * misbehave.
 	 */
 	
+	/* Getting the input data from the user */
+	string cipherName = argv[1];
+	string cipherMethod = argv[3];
+	string inputFileName = argv[4];
+	string outputFileName = argv[5];
 	
 	
 	/* Create an instance of the DES cipher */	
