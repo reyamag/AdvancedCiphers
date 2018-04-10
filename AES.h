@@ -48,7 +48,7 @@ class AES: public CipherInterface
 	/* The protected members */
 	protected:
 		//Declare the AES key
-		unsigned char key[] = {};
+		unsigned char aes_key[] = {};
 };
 
 
