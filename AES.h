@@ -48,7 +48,7 @@ class AES: public CipherInterface
 	/* The protected members */
 	protected:
 		//Declare the AES key
-		const static unsigned char aes_key[] = {};
+		const static unsigned char key[] = {};
 };
 
 
