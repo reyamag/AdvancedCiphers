@@ -18,7 +18,6 @@ class AES: public CipherInterface
 {
 	/* The public members */
 	public:
-		
 		/**
 		 * The default constructor
 	 	 */
@@ -48,8 +47,8 @@ class AES: public CipherInterface
 			
 	/* The protected members */
 	protected:
-
-		//TODO: declare the AES key
+		//Declare the AES key
+		const static unsigned char aes_key[16] = {};
 };
 
 
