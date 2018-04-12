@@ -12,7 +12,7 @@
  * (should be 16 of them).
  * @return - True if the key is valid and False otherwise
  */
-bool AES::setKey(const unsigned char* keyArray[])
+bool AES::setKey(const unsigned char* keyArray)
 {
 	
 	// TODO: AES implementation of openssl cares about whether
@@ -30,20 +30,20 @@ bool AES::setKey(const unsigned char* keyArray[])
 	// For documentation, please see https://boringssl.googlesource.com/boringssl/+/2623/include/openssl/aes.h
 	// and aes.cpp example provided with the assignment.
 	
-	string keyArray[17];
+    //GAVE ERR: string keyArray[17];
 
 	//Checking for the first byte to see if the key is going to be used for 
 	//encrpytion or decrpyption
 	if (keyArray[0] == 0)
 	{
 		AES_KEY enc_key;
-		AES_set_encrpyt_key(aes_key, 128, &enc_key);
+		AES_set_encrypt_key(aes_key, 128, &enc_key);
 		return true;
 	} 
 	else if (keyArray[0] != 0)
 	{
 		AES_KEY dec_key;
-		AES_set_decrpyt_key(aes_key, 128, &dec_key);
+		AES_set_decrypt_key(aes_key, 128, &dec_key);
 		return true;
 	} 
 	else
@@ -77,11 +77,12 @@ unsigned char* AES::encrypt(const unsigned char* plainText)
 	
 	for (int i = 0; i < 16; i++)
 	{
-		cipherText[i] = plainText;
+		//GAVE ERR: cipherText[i] = plainText;
 	}
 	
 	//Return pointer to cipherText
-	return cipherText;	
+    //GAVE ERR: return cipherText;
+    return NULL;
 }
 
 /**
@@ -109,11 +110,12 @@ unsigned char* AES::decrypt(const unsigned char* cipherText)
 
 	for (int i = 0; i < 16; i++)
 	{
-		plainTextAfterDec[i] = cipherText;
+		//GAVE ERR: plainTextAfterDec[i] = cipherText;
 	}
 	
 	//Return pointer to the plaintext
-	return plainTextAfterDec;
+	//GAVE ERR: return plainTextAfterDec;
+    return NULL;
 }
 
 
