@@ -11,7 +11,7 @@ typedef unsigned char uchar;
 
 // From Stacked Overflow: https://stackoverflow.com/questions/5840148/how-can-i-get-a-files-size-in-c
 std::ifstream::pos_type filesize(string filename) {
-    std::ifstream in(filename, std::ifstream::ate | std::ifstream::binary);
+    std::ifstream in(filename.c_str(), std::ifstream::ate | std::ifstream::binary);
     return in.tellg();
 }
 
@@ -40,7 +40,7 @@ uchar * readFromFile(string filename, bool DES_padding = false) {
     
     uchar * input = new uchar[arrayLength];
     ifstream inFile;
-    inFile.open(filename);
+    inFile.open(filename.c_str());
     
     char c;
     int i = 0;
@@ -58,7 +58,7 @@ uchar * readFromFile(string filename, bool DES_padding = false) {
 void writeToFile(string filename, unsigned char * uchar_input) {
     
     ofstream outFile;
-    outFile.open(filename);
+    outFile.open(filename.c_str());
     outFile << uchar_input;
     outFile.close();
 }
