@@ -1,14 +1,42 @@
 # AdvancedCiphers
+A program written in C++ that implements DES & AES ecnryption/decryption on blocks of text.
 
-To compile, simply, type ''make'' at the terminal (without the quotes).
+# Authors
+Charles Bucher: charles.abucher@gmail.com <br>
+Reyniel Maglian: rrmaglian@csu.fullerton.edu
 
-Please do not forget to include a README file in your submission.
-It's worth 5 points.
+# Instructions
 
-Your README file should include:
+1. Ensure support
+Ensure openssl is a library installed on your machine with support for c++11
 
-– Names and email addresses of all partners.
-– The programming language you use (e.g. C++ or Java)
-– How to execute your program.
-– Whether you implemented the extra credit.
-– Anything special about your submission that we should take note of.
+2. Compile & Build
+Run: `make clean`
+Run: `make`
+
+3. Run
+***./cipher <CIPHER_NAME> \<KEY> <ENC/DEC> <INPUT_FILE> <OUTPUT_FILE>***
+
+# Argument Descriptions
+
+<CIPHER_NAME>:
+- DES
+- AES
+
+\<KEY>:
+- The key that the encryption/decryption algorithm will use
+- Valid DES keys: 16 characters representing a 64-bit hexadecimal number
+- Valid AES keys: 16 characters representing a 128-bit number
+
+<ENC/DEC>:
+- To decrypt, or encrypt, respectively
+
+<INPUT_FILE>:
+- The file whose contents will be encrypted /decrypted.
+
+<OUTPUT_FILE>:
+- The file that will be outputed with the encrypted/decrypted code.
+
+# Additional
+
+No extra credit implemented or special considerations.
