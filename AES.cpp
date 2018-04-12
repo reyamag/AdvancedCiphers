@@ -30,7 +30,6 @@ bool AES::setKey(const unsigned char* keyArray)
 	// For documentation, please see https://boringssl.googlesource.com/boringssl/+/2623/include/openssl/aes.h
 	// and aes.cpp example provided with the assignment.
 	
-    //GAVE ERR: string keyArray[17];
 
 	//Checking for the first byte to see if the key is going to be used for 
 	//encrpytion or decrpyption
