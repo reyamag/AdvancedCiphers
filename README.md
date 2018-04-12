@@ -7,14 +7,14 @@ Reyniel Maglian: rrmaglian@csu.fullerton.edu
 
 # Instructions
 
-1. Ensure support
+1. *Setup<br>*
 Ensure openssl is a library installed on your machine with support for c++11
 
-2. Compile & Build
-Run: `make clean`
+2. *Compile & Build*<br>
+Run: `make clean`<br>
 Run: `make`
 
-3. Run
+3. *Execute*<br>
 ***./cipher <CIPHER_NAME> \<KEY> <ENC/DEC> <INPUT_FILE> <OUTPUT_FILE>***
 
 # Argument Descriptions
