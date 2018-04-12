@@ -30,16 +30,22 @@ bool AES::setKey(const unsigned char* keyArray)
 	// For documentation, please see https://boringssl.googlesource.com/boringssl/+/2623/include/openssl/aes.h
 	// and aes.cpp example provided with the assignment.
 	
-
+	//Passing keyArray into a 17 byte key to indicate whether or not we are encrypting or decrytping
+	unsigned char tempArray[17] = {};
+	for (i = 0; i < 17; i++)
+	{
+		tempArray[i] = keyArray[i];
+	}
+	
 	//Checking for the first byte to see if the key is going to be used for 
 	//encrpytion or decrpyption
-	if (keyArray[0] == 0)
+	if (tempArray[0] == 0)
 	{
 		AES_KEY enc_key;
 		AES_set_encrypt_key(aes_key, 128, &enc_key);
 		return true;
 	} 
-	else if (keyArray[0] != 0)
+	else if (tempArray[0] != 0)
 	{
 		AES_KEY dec_key;
 		AES_set_decrypt_key(aes_key, 128, &dec_key);
@@ -63,25 +69,21 @@ unsigned char* AES::encrypt(const unsigned char* plainText)
 	//	and the aes.cpp example provided.
 	// 	3. Return the pointer to the ciphertext
 
-	string *cipherText = NULL;
-	cipherText = new string[16]; //Allocating a block that holds 16 bytes
-
-	//Declare needed for the encrypt function
-	unsigned char enc_out[17];
-	memset(enc_out, 0, 17);
+	//Allocating a block that holds 16 bytes
+	string *enc_out = NULL;
+	enc_out = new string[16]; 
+	
+	//Clearing the allocated array to store the ciphertext
+	memset(enc_out, 0, 16);
+	
+	//Getting the encryption key from openssl
 	AES_KEY enc_key;
 
 	//Encrypt
 	AES_ecb_encrypt(plainText, enc_out, &enc_key, AES_ENCRYPT);
 	
-	for (int i = 0; i < 16; i++)
-	{
-		//GAVE ERR: cipherText[i] = plainText;
-	}
-	
 	//Return pointer to cipherText
-    //GAVE ERR: return cipherText;
-    return NULL;
+	return NULL;
 }
 
 /**
@@ -95,27 +97,18 @@ unsigned char* AES::decrypt(const unsigned char* cipherText)
 	//	2. Use AES_ecb_encrypt(...) to decrypt the text (please see the URL in setKey(...)
 	//	and the aes.cpp example provided.
 	// 	3. Return the pointer to the plaintext
+	
+	//Allocating a block that holds 16 bytes
+	string *dec_out = NULL;
+	dec_out = new string[16]; 
 
-	int *plainTextAfterDec = NULL;
-	plainTextAfterDec = new int[16]; //Allocating a block that holds 16 bytes
-
-	//Declare needed for the decrypt function
-	unsigned char dec_out[17];
-	memset(dec_out, 0, 17);
+	//Clearing the allocted array to store the plaintext
+	memset(dec_out, 0, 16);
 	AES_KEY dec_key;
 
 	//Decrypt
 	AES_ecb_encrypt(cipherText, dec_out, &dec_key, AES_DECRYPT);
-
-	for (int i = 0; i < 16; i++)
-	{
-		//GAVE ERR: plainTextAfterDec[i] = cipherText;
-	}
 	
 	//Return pointer to the plaintext
-	//GAVE ERR: return plainTextAfterDec;
-    return NULL;
+    	return NULL;
 }
-
-
-
