@@ -40,7 +40,7 @@ bool AES::setKey(const unsigned char* keyArray[])
 		AES_set_encrpyt_key(aes_key, 128, &enc_key);
 		return true;
 	} 
-	else if (keyArray[0] > 0)
+	else if (keyArray[0] != 0)
 	{
 		AES_KEY dec_key;
 		AES_set_decrpyt_key(aes_key, 128, &dec_key);
