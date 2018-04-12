@@ -1,4 +1,10 @@
 #include "DES.h"
+#include <iostream>
+using std::cout;
+using std::endl;
+
+#define ENC 1
+#define DEC 0
 
 /**
  * Sets the key to use
@@ -49,7 +55,7 @@ bool DES::setKey(const unsigned char* keyArray)
 	
 	
 	/* Set the encryption key */
-	if ((keyErrorCode = des_set_key_checked(&des_key, this->key)) != 0)
+	if ((keyErrorCode = DES_set_key_checked(&des_key, &(*this).key)) != 0)
 	{
 		fprintf(stderr, "\nkey error %d\n", keyErrorCode);
 		
@@ -65,21 +71,50 @@ bool DES::setKey(const unsigned char* keyArray)
  * @param plaintext - the plaintext string
  * @return - the encrypted ciphertext string
  */
-unsigned char* DES::encrypt(const unsigned char* plaintext)
-{
+unsigned char* DES::encrypt(const unsigned char* plaintext) {
+    
+    unsigned char cipherText[9]; // Our ciphertext
+
 	//LOGIC:
 	//1. Check to make sure that the block is exactly 8 characters (i.e. 64 bits)
-	//2. Declate an array DES_LONG block[2];
+    // Checked beforehand
+
+	//2. Declare an array DES_LONG block[2];
+    DES_LONG block[2];
+
 	//3. Use ctol() to convert the first 4 chars into long; store the result in block[0]
+    unsigned char firstFour[4];
+    firstFour[0] = plaintext[0];
+    firstFour[1] = plaintext[1];
+    firstFour[2] = plaintext[2];
+    firstFour[3] = plaintext[3];
+    block[0] = ctol(firstFour);
+
 	//4. Use ctol() to convert the second 4 chars into long; store the resul in block[1]
-	//5. Perform des_encrypt1 in order to encrypt the block using this->key (see sample codes for details)
+    unsigned char secondFour[4];
+    secondFour[0] = plaintext[4];
+    secondFour[1] = plaintext[5];
+    secondFour[2] = plaintext[6];
+    secondFour[3] = plaintext[7];
+    block[1] = ctol(secondFour);
+
+    //5. Perform des_encrypt1 in order to encrypt the block using this->key (see sample codes for details)
+    DES_encrypt1(block, &key, ENC);
+	memset(cipherText, 0, 9);
+
 	//6. Convert the first ciphertext long to 4 characters using ltoc()
+    ltoc(block[0], cipherText);
+
 	//7. Convert the second ciphertext long to 4 characters using ltoc()
+    ltoc(block[1], cipherText + 4);
+
 	//8. Save the results in the the dynamically allocated char array 
 	// (e.g. unsigned char* bytes = nerw unsigned char[8]).
+    unsigned char * bytes = new unsigned char[8];
+    bytes = cipherText;
+
 	//9. Return the pointer to the dynamically allocated array.
-	
-	return NULL;
+	return bytes;
 }
 
 /**
@@ -87,10 +122,50 @@ unsigned char* DES::encrypt(const unsigned char* plaintext)
  * @param ciphertext - the ciphertext
  * @return - the plaintext
  */
-unsigned char* DES::decrypt(const unsigned char* ciphertext)
-{
+unsigned char* DES::decrypt(const unsigned char* ciphertext) {
+
+	unsigned char plaintext[9]; // Our ciphertext
+
 	//LOGIC:
-	// Same logic as encrypt(), except in step 5. decrypt instead of encrypting
+	//1. Check to make sure that the block is exactly 8 characters (i.e. 64 bits)
+    // Checked beforehand
+
+	//2. Declare an array DES_LONG block[2];
+    DES_LONG block[2];
+
+	//3. Use ctol() to convert the first 4 chars into long; store the result in block[0]
+    unsigned char firstFour[4];
+    firstFour[0] = ciphertext[0];
+    firstFour[1] = ciphertext[1];
+    firstFour[2] = ciphertext[2];
+    firstFour[3] = ciphertext[3];
+    block[0] = ctol(firstFour);
+
+	//4. Use ctol() to convert the second 4 chars into long; store the resul in block[1]
+    unsigned char secondFour[4];
+    secondFour[0] = ciphertext[4];
+    secondFour[1] = ciphertext[5];
+    secondFour[2] = ciphertext[6];
+    secondFour[3] = ciphertext[7];
+    block[1] = ctol(secondFour);
+
+    //5. Perform des_encrypt1 in order to encrypt the block using this->key (see sample codes for details)
+    DES_encrypt1(block, &key, DEC);
+	memset(plaintext, 0, 9);
+
+	//6. Convert the first ciphertext long to 4 characters using ltoc()
+    ltoc(block[0], plaintext);
+
+	//7. Convert the second ciphertext long to 4 characters using ltoc()
+    ltoc(block[1], plaintext + 4);
+
+	//8. Save the results in the the dynamically allocated char array 
+	// (e.g. unsigned char* bytes = nerw unsigned char[8]).
+    unsigned char * bytes = new unsigned char[8];
+    bytes = plaintext;
+
+	//9. Return the pointer to the dynamically allocated array.
+	return bytes;
 }
 
 /**
