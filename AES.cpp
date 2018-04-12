@@ -12,7 +12,7 @@
  * (should be 16 of them).
  * @return - True if the key is valid and False otherwise
  */
-bool AES::setKey(const unsigned char* keyArray)
+bool AES::setKey(const unsigned char* keyArray[])
 {
 	
 	// TODO: AES implementation of openssl cares about whether
