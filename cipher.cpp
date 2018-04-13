@@ -28,7 +28,20 @@ int DES_filesize(string filename) {
             return true_size -= 1;
         }
     }
+    return true_size;
+}
 
+int AES_filesize(string filename) {
+    int true_size = int(filesize(filename));
+
+    if(true_size % 16 == 1) {
+        ifstream inFile(filename.c_str());
+        inFile.seekg(0, std::ios::end);
+        inFile.seekg(-1, std::ios::cur);
+        if(int(inFile.get()) == 0) {
+            return true_size -= 1;
+        }
+    }
     return true_size;
 }
 
@@ -36,6 +49,16 @@ int numberOfBlocks(string filename) {
     int size = DES_filesize(filename);
     
     const int BYTE_SIZE = 8;
+    
+    int base = int((size) / BYTE_SIZE);
+    int numberOfNulls = (BYTE_SIZE - (size - BYTE_SIZE*base)) % BYTE_SIZE;
+    return base + (numberOfNulls == 0 ? 0 : 1);
+}
+
+int numofAESblocks(string filename) {
+    int size = AES_filesize(filename);
+    
+    const int BYTE_SIZE = 16;
     
     int base = int((size) / BYTE_SIZE);
     int numberOfNulls = (BYTE_SIZE - (size - BYTE_SIZE*base)) % BYTE_SIZE;
@@ -69,6 +92,39 @@ uchar * readFromFile(string filename, bool DES_padding = false) {
     }
     for(int i = 0; i < numberOfNulls; ++i) {
         input[arrayLength-1-i] = 0;
+    }
+    
+    inFile.close();
+    return input;
+}
+
+uchar * readFileForAES(string filename, bool AES_padding = false) {
+    
+    int arrayLengthAES = int(filesize(filename));
+    int numberOfNulls = 0;
+    
+    if(AES_padding) {
+        const int BYTE_SIZE = 16;
+
+        arrayLengthAES = AES_filesize(filename); // Override if DES
+        
+        int base = int((arrayLengthAES) / BYTE_SIZE);
+
+        numberOfNulls = (BYTE_SIZE - (arrayLengthAES - BYTE_SIZE*base)) % BYTE_SIZE;
+        arrayLengthAES = (BYTE_SIZE * (base + (numberOfNulls == 0 ? 0 : 1)));
+    }
+    
+    uchar * input = new uchar[arrayLengthAES];
+    ifstream inFile;
+    inFile.open(filename.c_str());
+    
+    char c;
+    int i = 0;
+    while(i < arrayLengthAES && inFile.get(c)) {
+        input[i++] = uchar(c);
+    }
+    for(int i = 0; i < numberOfNulls; ++i) {
+        input[arrayLengthAES-1-i] = 0;
     }
     
     inFile.close();
@@ -134,6 +190,10 @@ int main(int argc, char** argv) {
     uchar * uchar_input = readFromFile(inFileName, cipherName == "DES");
     uchar * uchar_output;
     int sizeOfOutput = 0;
+    
+    uchar * uchar_inputAES = readFromFile(inFileName, cipherName == "AES");
+    uchar * uchar_outputAES;
+    int sizeOfOutputAES = 0;
 
     if(cipherName == "DES") {
         // DES is encrypted/decrypted in 8 byte blocks
@@ -146,7 +206,8 @@ int main(int argc, char** argv) {
         memset(uchar_output, 0, sizeOfOutput);
         
         // Loop through each block, processing one at a time
-        for(int i = 0; i < blocks; ++i) {
+        for(int i = 0; i < blocks; ++i) 
+        {
             // Get block
             uchar * singleBlock = new uchar[9];
             memcpy(singleBlock, uchar_input + 8*i, 8);
@@ -170,10 +231,47 @@ int main(int argc, char** argv) {
             delete[] singleBlock;
             delete[] blockProcessed;
         }
-
         uchar_output[blocks*8] = 0; // Null terminating character
+        
+    } else if (cipherName == "AES"){
+        // AES encrypts/decrypts in 16 byte blocks
+        // First, determine the number of blocks
+        int AESblocks = numofAESblocks(inFileName);
 
-    } else {
+        // The total size of our input
+        sizeOfOutputAES = blocks*16 + 1;
+        uchar_outputAES = new uchar[sizeOfOutputAES];
+        memset(uchar_outputAES, 0, sizeOfOutputAES);
+        
+        // Loop through each block, processing one at a time
+        for(int i = 0; i < blocks; ++i) 
+        {
+            // Get block
+            uchar * singleBlockAES = new uchar[16];
+            memcpy(singleBlockAES, uchar_inputAES + 16*i, 16);
+            singleBlockAES[16] = 0; // Null terminating character
+
+            uchar * AESblock = new uchar[17];
+            // Perform encryption/decryption
+            if(method == "ENC") {
+                AESblock = cipher->encrypt(singleBlockAES);
+            } else if(method == "DEC") {
+                AESblock = cipher->decrypt(singleBlockAES);
+            } else {
+                cerr << "Invalid method! Please enter 'ENC' or 'DEC'.\n";
+            }
+            AESblock[16] = 0; // Null terminating character
+
+            // Update master ciphertext with this encrypted block
+            memcpy(uchar_outputAES + 16*i, AESblock, 16);
+
+            // Deallocate memory for the single block
+            delete[] singleBlockAES;
+            delete[] AESblock;
+        }
+        uchar_outputAES[AESblocks*16] = 0; // Null terminating character 
+    }
+    else {
         if(method == "ENC") {
             uchar_output = cipher->encrypt(uchar_input);
         } else if(method == "DEC") {
