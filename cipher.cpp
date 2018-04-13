@@ -5,7 +5,9 @@
 #include "DES.h"
 #include "AES.h"
 
-using namespace std;
+using std::cout;
+using std::endl;
+using std::string;
 
 typedef unsigned char uchar;
 
@@ -15,8 +17,23 @@ std::ifstream::pos_type filesize(string filename) {
     return in.tellg();
 }
 
+int DES_filesize(string filename) {
+    int true_size = int(filesize(filename));
+
+    if(true_size % 8 == 1) {
+        ifstream inFile(filename.c_str());
+        inFile.seekg(0, std::ios::end);
+        inFile.seekg(-1, std::ios::cur);
+        if(int(inFile.get()) == 0) {
+            return true_size -= 1;
+        }
+    }
+
+    return true_size;
+}
+
 int numberOfBlocks(string filename) {
-    int size = int(filesize(filename));
+    int size = DES_filesize(filename);
     
     const int BYTE_SIZE = 8;
     
@@ -32,8 +49,11 @@ uchar * readFromFile(string filename, bool DES_padding = false) {
     
     if(DES_padding) {
         const int BYTE_SIZE = 8;
+
+        arrayLength = DES_filesize(filename); // Override if DES
         
         int base = int((arrayLength) / BYTE_SIZE);
+
         numberOfNulls = (BYTE_SIZE - (arrayLength - BYTE_SIZE*base)) % BYTE_SIZE;
         arrayLength = (BYTE_SIZE * (base + (numberOfNulls == 0 ? 0 : 1)));
     }
@@ -44,7 +64,7 @@ uchar * readFromFile(string filename, bool DES_padding = false) {
     
     char c;
     int i = 0;
-    while(inFile.get(c)) {
+    while(i < arrayLength && inFile.get(c)) {
         input[i++] = uchar(c);
     }
     for(int i = 0; i < numberOfNulls; ++i) {
@@ -55,24 +75,19 @@ uchar * readFromFile(string filename, bool DES_padding = false) {
     return input;
 }
 
-void writeToFile(string filename, unsigned char * uchar_input) {
+void writeToFile(string filename, unsigned char * uchar_input, int sizeOfInput) {
     
     ofstream outFile;
     outFile.open(filename.c_str());
-    outFile << uchar_input;
+    for(int i = 0; i < sizeOfInput; ++i) {
+        outFile << uchar_input[i];
+    }
     outFile.close();
 }
 
-int main(int argc, char** argv)
-{
-    /**
-     * TODO: Replace the code below    with your code which can SWITCH
-     * between DES and AES and encrypt files. DO NOT FORGET TO PAD
-     * THE LAST BLOCK IF NECESSARY.
-     *
-     * NOTE: due to the incomplete skeleton, the code may crash or
-     * misbehave.
-     */
+int main(int argc, char** argv) {
+    
+    cout << endl; // Pad terminal output.
     
     if(argc != 6) {
         cerr << "Incorrect number of arguments!\n";
@@ -118,64 +133,60 @@ int main(int argc, char** argv)
     /* Read input from the file */
     uchar * uchar_input = readFromFile(inFileName, cipherName == "DES");
     uchar * uchar_output;
-    if(method == "ENC") {
-        if(cipherName == "DES") {
-            // DES is encrypted in 8 byte blocks
-            // First, determine the number of blocks
-            int blocks = numberOfBlocks(inFileName);
-            // The total size of our ciphertext
-            uchar_output = new uchar[blocks*8];
-            
-            // Loop through each block, encrypted one at a time
-            for(int i = 0; i < blocks; ++i) {
-                // Get block
-                uchar singleBlock[8];
-                memcpy(singleBlock, uchar_input + 8*i, 8);
-                
-                // Encrypt block
-                uchar * blockEncrypted = cipher->encrypt(singleBlock);
-                
-                // Update master ciphertext with this encrypted block
-                for(int j = 0; j < 8; ++j) {
-                    uchar_output[i*8 + j] = blockEncrypted[j];
-                }
+    int sizeOfOutput = 0;
+
+    if(cipherName == "DES") {
+        // DES is encrypted/decrypted in 8 byte blocks
+        // First, determine the number of blocks
+        int blocks = numberOfBlocks(inFileName);
+
+        // The total size of our input
+        sizeOfOutput = blocks*8 + 1;
+        uchar_output = new uchar[sizeOfOutput];
+        memset(uchar_output, 0, sizeOfOutput);
+        
+        // Loop through each block, processing one at a time
+        for(int i = 0; i < blocks; ++i) {
+            // Get block
+            uchar * singleBlock = new uchar[9];
+            memcpy(singleBlock, uchar_input + 8*i, 8);
+            singleBlock[8] = 0; // Null terminating character
+
+            uchar * blockProcessed = new uchar[9];
+            // Perform encryption/decryption
+            if(method == "ENC") {
+                blockProcessed = cipher->encrypt(singleBlock);
+            } else if(method == "DEC") {
+                blockProcessed = cipher->decrypt(singleBlock);
+            } else {
+                cerr << "Invalid method! Please enter 'ENC' or 'DEC'.\n";
             }
-        } else {
-            // AES is easy
-            uchar_output = cipher->encrypt(uchar_input);
+            blockProcessed[8] = 0; // Null terminating character
+
+            // Update master ciphertext with this encrypted block
+            memcpy(uchar_output + 8*i, blockProcessed, 8);
+
+            // Deallocate memory for the single block
+            delete[] singleBlock;
+            delete[] blockProcessed;
         }
-    } else if(method == "DEC") {
-        if(cipherName == "DES") {
-            // DES is decrypted in 8 byte blocks
-            // First, determine the number of blocks
-            int blocks = numberOfBlocks(inFileName);
-            // The total size of our plaintext
-            uchar_output = new uchar[blocks*8];
-            
-            // Loop through each block, decrypted one at a time
-            for(int i = 0; i < blocks; ++i) {
-                // Get block
-                uchar singleBlock[8];
-                memcpy(singleBlock, uchar_input + 8*i, 8);
-                
-                // Encrypt block
-                uchar * blockDecrypted = cipher->decrypt(singleBlock);
-                
-                // Update master ciphertext with this encrypted block
-                for(int j = 0; j < 8; ++j) {
-                    uchar_output[i*8 + j] = blockDecrypted[j];
-                }
-            }
-        } else {
-            // AES is easy
-            uchar_output = cipher->encrypt(uchar_input);
-        }
+
+        uchar_output[blocks*8] = 0; // Null terminating character
+
     } else {
-        cerr << "Invalid method! Please enter 'ENC' or 'DEC'.\n";
-        return 1;
+        if(method == "ENC") {
+            uchar_output = cipher->encrypt(uchar_input);
+        } else if(method == "DEC") {
+            uchar_output = cipher->decrypt(uchar_input);
+        } else {
+            cerr << "Invalid method! Please enter 'ENC' or 'DEC'.\n";
+        }
     }
     
-    writeToFile(outFileName, uchar_output);
+    writeToFile(outFileName, uchar_output, sizeOfOutput);
+
+    cout << (method == "ENC" ? "Encryption " : "Decryption ") << "successful!" << endl;
     
+    cout << endl; // Pad terminal output
     return 0;
 }
