@@ -35,20 +35,21 @@ class AES: public CipherInterface
 		 * @param plainText - the plaintext string
 		 * @return - the encrypted ciphertext string
 		 */
-		virtual unsigned char* encrypt(const unsigned char* plainText);
+		virtual unsigned char* encrypt(const unsigned char* plaintext);
 
 		/**
 		 * Decrypts a string of cipherText
 		 * @param ciphertext - the cipherText
 		 * @return - the plaintext
 		 */
-		virtual unsigned char* decrypt(const unsigned char* cipherText);
+		virtual unsigned char* decrypt(const unsigned char* ciphertext);
 	
 			
 	/* The protected members */
 	protected:
 		//Declare the AES key
 		unsigned char aes_key[16];
+        AES_KEY enc_key, dec_key;
 };
 
 
