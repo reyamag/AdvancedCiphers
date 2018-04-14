@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <iostream> // TO DELETE
 #include <stdlib.h>
 #include <string.h>
 #include <openssl/aes.h>
@@ -7,12 +8,32 @@
 /* g++ myaes.cpp -o myaes -lcrypto */
 
 /* AES key for Encryption and Decryption */
-const static unsigned char aes_key[]={0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xAA,0xBB,0xCC,0xDD,0xEE,0xFF};
+// "0123456789abcdef"
+const static unsigned char aes_key[]={0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x61,0x62,0x63,0x64,0x65,0x66};
 
-int main( )
-{
+int main( ) {
+
+    std::cout << "Key: ";
+    for(int i = 0; i < 16; ++i) {
+        std::cout << aes_key[i];
+    } std::cout << std::endl;
+
 	/* Input data to encrypt (128-bits i.e., 16 bytes) */
-	unsigned char aes_input[]="helloworld123456";
+	unsigned char * aes_input = new unsigned char[16];
+    memset(aes_input, 0, 16);
+    aes_input[0] = 'S';
+    aes_input[1] = 'h';
+    aes_input[2] = 'o';
+    aes_input[3] = 'r';
+    aes_input[4] = 't';
+    aes_input[5] = ' ';
+    aes_input[6] = 't';
+    aes_input[7] = 'e';
+    aes_input[8] = 'x';
+    aes_input[9] = 't';
+    aes_input[10] = '.';
+    
+
 	
 	/* Buffers for Encryption and Decryption. NOTE: I am making my buffers
 	 * 18 here in order to leave one place for the string NULL terminator
@@ -37,7 +58,14 @@ int main( )
 	}
 
 	/* Encrypt! */
+
 	AES_ecb_encrypt(aes_input, enc_out, &enc_key, AES_ENCRYPT);
+
+    fprintf(stderr, "Ciphertext: %s\n", enc_out);
+
+    for(int i =0; i < 16; ++i) {
+        std::cout << i+1 << ": " << enc_out[i] << " (" << int(enc_out[i]) << ")" << std::endl;
+    }
 
 	/** Now, lets decrypt the text we have encrypted **/
 	
@@ -50,6 +78,10 @@ int main( )
 	
 	/* Decrypt! */
 	AES_ecb_encrypt(enc_out, dec_out, &dec_key, AES_DECRYPT);
+
+    for(int i =0; i < 16; ++i) {
+        std::cout << i+1 << ": " << dec_out[i] << " (" << int(dec_out[i]) << ")" << std::endl;
+    }
 	
 	fprintf(stderr, "I have encrypted and decrypted text %s. The end result is %s\n", aes_input, dec_out);
 		
