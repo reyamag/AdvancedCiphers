@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cassert>
 #include "CipherInterface.h"
 #include "DES.h"
 #include "AES.h"
